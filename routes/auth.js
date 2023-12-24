@@ -34,14 +34,14 @@ router.post(
           .json({ success, error: "sorry a user with this email already exist" });
       }
       //password encription
-      const salt = await bcrypt.genSalt(10);
-      secPass = await bcrypt.hash(req.body.password, salt);
+      // const salt = await bcrypt.genSalt(10);
+      // secPass = await bcrypt.hash(req.body.password, salt);
 
       //create a new user
       user = await User.create({
         name: req.body.name,
         email: req.body.email,
-        password: secPass,
+        password: req.body.password,
       });
       const data = {
         user: {
@@ -80,8 +80,8 @@ router.post(
           .status(404)
           .json({ error: "please try to login with correct credentials" });
       }
-      const passwordCompare = await bcrypt.compare(password, user.password);
-      if (!passwordCompare) {
+      // const passwordCompare = await bcrypt.compare(password, user.password);
+      if (!await user.matchPassword(password)) {
         success=false;
         return res
           .status(404)

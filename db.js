@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 //const mongoURI = "mongodb://localhost:27017/inotebook";
 const mongoURI=process.env.MONGOOSE_URL;
 const connectToMongo = async () => {
+  mongoose.set('strictQuery', true)
   await mongoose
     .connect(mongoURI)
     .then(console.log("database connected"))
