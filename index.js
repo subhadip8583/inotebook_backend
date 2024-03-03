@@ -1,24 +1,25 @@
-const dotenv=require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
 const connectToMongo = require("./db");
-var cors = require('cors')
+var cors = require("cors");
 var nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const User = require('./models/User');
-const createJwtToken = require('./token');
+const User = require("./models/User");
+const createJwtToken = require("./token");
 
 // database connection
 connectToMongo();
 const app = express();
-const port =process.env.PORT || 5000 ;
-app.use(cors())
+const port = process.env.PORT || 5000;
+app.use(cors());
 
 app.use(express.json());
 
 // availabel routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/notes", require("./routes/notes"));
+app.use("/api/verifications", require("./routes/verifications"));
 //email sending
 const transporter = nodemailer.createTransport({
   port: 465,
@@ -51,7 +52,7 @@ app.get("/users/single", async (req, res) => {
   }
 });
 
-app.get("/api/user/mail", async (req, res) => {
+app.post("/api/user/mail", async (req, res) => {
   try {
     const email = req.body.email;
     const user = await User.findOne({
@@ -64,7 +65,7 @@ app.get("/api/user/mail", async (req, res) => {
       subject: "Sending Email using Node.js",
       text: "That was easy!",
       html: `
-      link - localhost:5000/api/user/validate?token=${token}
+      link - ${process.env.FRONTEND_URL}/resetpassword?token=${token}
       `,
     };
     transporter.sendMail(mailData);
@@ -76,7 +77,7 @@ app.get("/api/user/mail", async (req, res) => {
   }
 });
 
-app.get("/api/user/validate", async (req, res) => {
+app.post("/api/user/validate", async (req, res) => {
   console.log("t1");
   try {
     console.log("t2");
